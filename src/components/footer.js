@@ -12,7 +12,7 @@ const Footer = () => {
         py: 3,
         px: 2,
         textAlign: 'center',
-        marginTop: 'auto',
+        width: '100%',
       }}
     >
       <Typography variant="h6" gutterBottom>
