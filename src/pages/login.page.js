@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
   Box,
   TextField,
@@ -8,33 +9,44 @@ import {
   Paper,
   Grid,
 } from '@mui/material';
+import AuthContext from '../context/authContext';
+import axios from 'axios';
 
 const LoginPage = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const { setUser } = useContext(AuthContext);
+  const navigate = useNavigate();
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log('Login Details:', { email, password });
-    // Add login logic here (API call, validation, etc.)
+    try {
+      const { data } = await axios.post('/api/v1/login', { email, password });
+      setUser(data.user);
+      if (data.user.role === 'admin') {
+        navigate('/admin');
+      } else {
+        navigate('/user');
+      }
+    } catch (error) {
+      console.error('Login failed:', error);
+    }
   };
 
   return (
     <Grid container component="main" sx={{ height: '100vh' }}>
-      {/* Left side image */}
       <Grid
         item
         xs={false}
         sm={4}
         md={6}
         sx={{
-          backgroundImage: 'url(https://th.bing.com/th/id/R.3aae4e19673b6eeea6fdf15df9190134?rik=TtGm95iOJ5rKfw&pid=ImgRaw&r=0)',
+          backgroundImage: 'url(https://oarex.com/wp-content/uploads/2021/01/ecommerce-funding.png)',
           backgroundRepeat: 'no-repeat',
           backgroundSize: 'cover',
           backgroundPosition: 'center',
         }}
       />
-      {/* Right side - Login Form */}
       <Grid
         item
         xs={12}
@@ -44,7 +56,7 @@ const LoginPage = () => {
         elevation={6}
         square
         sx={{
-          background: 'linear-gradient(to right, #3C7EB7FF, #21AEB3FF)', // Gradient background
+          background: 'linear-gradient(to right, #C5C7A48B, #372F03AF)',
           display: 'flex',
           justifyContent: 'center',
           alignItems: 'center',
@@ -57,15 +69,15 @@ const LoginPage = () => {
             padding: 3,
             borderRadius: 2,
             border: '2px solid white',
-            backgroundColor: 'rgba(255, 255, 255, 0.8)', // Slightly transparent white
-            boxShadow: '0 8px 16px rgba(0, 0, 0, 0.2)', // Subtle shadow
+            backgroundColor: 'rgba(255, 255, 255, 0.8)',
+            boxShadow: '0 8px 16px rgba(0, 0, 0, 0.2)',
           }}
         >
           <Box
             sx={{
               padding: 2,
               borderRadius: 1,
-              backgroundColor: '#f5f5f5', // Inner light grey box
+              backgroundColor: '#f5f5f5',
               textAlign: 'center',
             }}
           >
@@ -76,12 +88,7 @@ const LoginPage = () => {
               Please login to continue shopping
             </Typography>
           </Box>
-          <Box
-            component="form"
-            noValidate
-            onSubmit={handleSubmit}
-            sx={{ mt: 3 }}
-          >
+          <Box component="form" noValidate onSubmit={handleSubmit} sx={{ mt: 3 }}>
             <TextField
               margin="normal"
               required
@@ -93,10 +100,7 @@ const LoginPage = () => {
               autoFocus
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              sx={{
-                backgroundColor: 'white',
-                borderRadius: 1,
-              }}
+              sx={{ backgroundColor: 'white', borderRadius: 1 }}
             />
             <TextField
               margin="normal"
@@ -109,10 +113,7 @@ const LoginPage = () => {
               autoComplete="current-password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              sx={{
-                backgroundColor: 'white',
-                borderRadius: 1,
-              }}
+              sx={{ backgroundColor: 'white', borderRadius: 1 }}
             />
             <Button
               type="submit"
@@ -133,7 +134,7 @@ const LoginPage = () => {
             </Button>
             <Grid container>
               <Grid item xs>
-                <Link href="#" variant="body2" sx={{ color: '#6a11cb' }}>
+                <Link href="/forgot-password" variant="body2" sx={{ color: '#6a11cb' }}>
                   Forgot password?
                 </Link>
               </Grid>
